@@ -7,28 +7,27 @@ use bc_utils_lg::{
     types::maps::MAP,
 };
 
+#[derive(Default)]
 pub struct State<'a> {
+    pub src: Vec<f64>,
     pub indications: MAP<&'a str, f64>,
+    pub signals_train: MAP<&'a str, f64>,
     pub signals: MAP<&'a str, Signal>,
-    // pub signals_train: MAP<&'a str, f64>,
-    pub res_utils_state: MAP<&'a str, f64>,
+    pub utils_state: MAP<&'a str, f64>,
     pub orders: MAP<&'a str, (Order, bool, Option<Trigger>)>,
     pub trade_state: TradeState<'a>,
 }
 
-impl<'a> State<'a> {
-    pub fn new(s: &SETTINGS_TRADE, src: &[Vec<f64>]) -> Self {
+impl<'a, 'b> State<'a> {
+    pub fn new(s: &SETTINGS_TRADE, src: &'b [Vec<f64>]) -> Self {
         Self {
-            trade_state: TradeState::new(
-                s.capital,
-                src[src.len() - 1].to_vec(),
-                src[src.len() - 2].to_vec(),
-            ),
+            src: src[src.len() - 1].to_vec(),
+            trade_state: TradeState::new(s.capital),
             indications: Default::default(),
+            signals_train: Default::default(),
             signals: Default::default(),
-            res_utils_state: Default::default(),
+            utils_state: Default::default(),
             orders: Default::default(),
-            // signals_train: Default::default(),
         }
     }
 }

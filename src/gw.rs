@@ -11,6 +11,7 @@ use bc_utils_state_gw::gw::UtilsStateGateway;
 
 use crate::gw_values::GWValues;
 
+#[derive(Default)]
 pub struct GW<'a> {
     pub indicators_gw: IndicatorsGateway<'a>,
     pub signals_gw: SignalsGateway<'a>,
@@ -24,18 +25,25 @@ pub struct GW<'a> {
 impl<'a> GW<'a> {
     pub fn new_with_s(s: &'a SETTINGS) -> Self {
         Self {
-            indicators_gw: IndicatorsGateway::new(ptr::null(), &s.indications),
-            signals_gw: SignalsGateway::new(ptr::null(), ptr::null(), &s.signals, &s.indications),
+            indicators_gw: IndicatorsGateway::new(ptr::null(), &s.pipeline.indications),
+            signals_gw: SignalsGateway::new(
+                ptr::null(),
+                ptr::null(),
+                ptr::null(),
+                &s.pipeline.signals_train,
+                &s.pipeline.signals,
+                &s.pipeline.indications,
+            ),
             signals_train_gw: SignalsTrainGateway::new(
                 ptr::null(),
                 ptr::null(),
-                &s.signals_train,
-                &s.indications,
+                &s.pipeline.signals_train,
+                &s.pipeline.indications,
             ),
             orders_collectors_gw: OrdersCollectorsGateway::new(ptr::null()),
-            order_creators_gw: OrderCreatorsGateway::new(ptr::null(), &s.order_creators),
-            order_filters_gw: OrderFilterGateway::new(ptr::null(), &s.order_filters),
-            utils_state_gw: UtilsStateGateway::new(ptr::null(), &s.utils_state),
+            order_creators_gw: OrderCreatorsGateway::new(ptr::null(), &s.pipeline.order_creators),
+            order_filters_gw: OrderFilterGateway::new(ptr::null(), &s.pipeline.order_filters),
+            utils_state_gw: UtilsStateGateway::new(ptr::null(), &s.pipeline.utils_state),
         }
     }
 

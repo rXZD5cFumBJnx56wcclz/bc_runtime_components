@@ -19,15 +19,8 @@ pub struct State<'a> {
 }
 
 impl<'a, 'b> State<'a> {
-    pub fn new(s: &SETTINGS_TRADE, src: &'b [Vec<f64>]) -> Self {
-        Self {
-            src: src[src.len() - 1].to_vec(),
-            trade_state: TradeState::new(s.capital),
-            indications: Default::default(),
-            signals_train: Default::default(),
-            signals: Default::default(),
-            utils_state: Default::default(),
-            orders: Default::default(),
-        }
+    pub fn init(&mut self, s: &SETTINGS_TRADE, src: &'b [Vec<f64>]) {
+        self.src = src[src.len() - 1].to_vec();
+        self.trade_state = TradeState::new(s.capital);
     }
 }

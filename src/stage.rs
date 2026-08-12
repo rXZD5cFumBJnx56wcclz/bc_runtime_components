@@ -1,5 +1,4 @@
 pub const STAGES: &[&str] = &[
-    "src",
     "indications",
     "signals_train",
     "signals",
@@ -10,7 +9,6 @@ pub const STAGES: &[&str] = &[
 ];
 
 pub const STAGES_STEP: &[&str] = &[
-    "src",
     "indications",
     "signals_train",
     "signals",

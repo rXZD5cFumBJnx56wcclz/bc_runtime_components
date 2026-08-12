@@ -21,9 +21,7 @@ bc_orders_collectors_gw = {path = "../bc_orders_collectors_gw"}
 bc_utils_state = {path = "../bc_utils_state"}
 bc_utils_state_gw = {path = "../bc_utils_state_gw"}
 bc_trade_state = {path = "../bc_trade_state"}
-bc_packs = {path = "../bc_packs"}
-
-pin-project = "1"
+bc_packs = {path = "../bc_packs"}   
 
 [dev-dependencies]
 bc_test_kit = {path = "../bc_test_kit"}

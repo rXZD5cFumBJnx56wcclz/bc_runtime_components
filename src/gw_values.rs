@@ -1,6 +1,6 @@
-use bc_order_creator_gw::gw::OrderCreators;
+use bc_order_collectors_gw::gw::OrderCollectors;
+use bc_order_creator_gw::gw::OrderCreator;
 use bc_order_filters_gw::gw::OrderFilters;
-use bc_orders_collectors_gw::gw::OrdersCollectors;
 use bc_packs::packs::Packs;
 use bc_utils_lg::structs::settings::SETTINGS_PIPELINE;
 
@@ -17,100 +17,96 @@ pub struct GWValues<'a> {
     pub signals_train: SignalsTrain<'a>,
     pub signals: Signals<'a>,
     pub utils_state: UtilsState<'a>,
-    pub order_creators: OrderCreators<'a>,
+    pub order_creator: OrderCreator,
     pub order_filters: OrderFilters<'a>,
-    pub orders_collectors: OrdersCollectors,
+    pub orders_collectors: OrderCollectors,
 }
 
 impl<'a> GWValues<'a> {
-    pub fn init_with(
-        &mut self,
-        src: &[Vec<f64>],
-        s: &'a SETTINGS_PIPELINE,
-        packs: &Packs,
-        stage_end: &str,
-    ) {
+    pub fn init_empty_with(&mut self, s: &'a SETTINGS_PIPELINE, packs: &Packs, stage_end: &str) {
         for (stage, func) in STAGES.iter().zip([
-            Self::init_ind,
-            Self::init_signals_train,
-            Self::init_signals,
-            Self::init_utils_state,
-            Self::init_order_creators,
-            Self::init_order_filters,
-            Self::init_orders_collectors,
+            Self::init_empty_ind,
+            Self::init_empty_signals_train,
+            Self::init_empty_signals,
+            Self::init_empty_utils_state,
+            Self::init_empty_order_filters,
+            Self::init_empty_orders_collectors,
         ]) {
-            func(self, src, s, packs);
+            func(self, s, packs);
+            if *stage == stage_end {
+                return;
+            }
+        }
+    }
+    pub fn init_empty_ind(&mut self, s: &'a SETTINGS_PIPELINE, packs: &Packs) {
+        self.indicators.init_empty(&s.indications, &packs.ind);
+    }
+
+    pub fn init_empty_signals_train(&mut self, s: &'a SETTINGS_PIPELINE, packs: &Packs) {
+        self.signals_train
+            .init_empty(&s.signals_train, &packs.signals_train);
+    }
+
+    pub fn init_empty_signals(&mut self, s: &'a SETTINGS_PIPELINE, packs: &Packs) {
+        self.signals.init_empty(&s.signals, &packs.signals);
+    }
+
+    pub fn init_empty_utils_state(&mut self, s: &'a SETTINGS_PIPELINE, packs: &Packs) {
+        self.utils_state.init(&s.utils_state, &packs.utils_state);
+    }
+
+    pub fn init_empty_order_filters(&mut self, s: &'a SETTINGS_PIPELINE, packs: &Packs) {
+        self.order_filters
+            .init(&s.order_filters, &packs.order_filters);
+    }
+
+    pub fn init_empty_orders_collectors(&mut self, s: &'a SETTINGS_PIPELINE, packs: &Packs) {
+        self.orders_collectors
+            .init(&s.order_collectors, &packs.orders_collectors);
+    }
+}
+
+impl<'a> GWValues<'a> {
+    pub fn init_bf_with(&mut self, src: &[Vec<f64>], s: &'a SETTINGS_PIPELINE, stage_end: &str) {
+        dbg!(src.len());
+        for (stage, func) in STAGES.iter().zip([
+            Self::init_bf_ind,
+            Self::init_bf_signals_train,
+            Self::init_bf_signals,
+        ]) {
+            func(self, src, s);
             if *stage == stage_end {
                 return;
             }
         }
     }
 
-    pub fn init_ind(&mut self, src: &[Vec<f64>], s: &'a SETTINGS_PIPELINE, packs: &Packs) {
-        self.indicators = Indicators::new(src, &s.indications, &packs.ind);
+    pub fn init_bf_ind(&mut self, src: &[Vec<f64>], s: &'a SETTINGS_PIPELINE) {
+        self.indicators.init_bf(src, &s.indications);
     }
 
-    pub fn init_signals_train(
-        &mut self,
-        src: &[Vec<f64>],
-        s: &'a SETTINGS_PIPELINE,
-        packs: &Packs,
-    ) {
-        self.signals_train = SignalsTrain::new(
-            src,
-            &s.signals_train,
-            &s.indications,
-            &self.indicators,
-            &packs.signals_train,
-        );
+    pub fn init_bf_signals_train(&mut self, src: &[Vec<f64>], s: &'a SETTINGS_PIPELINE) {
+        self.signals_train
+            .init_bf(src, &s.signals_train, &s.indications, &self.indicators);
     }
 
-    pub fn init_signals(&mut self, src: &[Vec<f64>], s: &'a SETTINGS_PIPELINE, packs: &Packs) {
-        self.signals = Signals::new(
+    pub fn init_bf_signals(&mut self, src: &[Vec<f64>], s: &'a SETTINGS_PIPELINE) {
+        self.signals.init_bf(
             src,
             &s.signals,
             &s.indications,
             &s.signals_train,
             &self.indicators,
             &self.signals_train,
-            &packs.signals,
         );
-    }
-
-    pub fn init_utils_state(&mut self, _: &[Vec<f64>], s: &'a SETTINGS_PIPELINE, packs: &Packs) {
-        self.utils_state = UtilsState::new(&s.utils_state, &packs.utils_state);
-    }
-
-    pub fn init_order_creators(&mut self, _: &[Vec<f64>], s: &'a SETTINGS_PIPELINE, _: &Packs) {
-        self.order_creators = OrderCreators::new(&s.order_creators);
-    }
-
-    pub fn init_order_filters(&mut self, _: &[Vec<f64>], s: &'a SETTINGS_PIPELINE, packs: &Packs) {
-        self.order_filters = OrderFilters::new(&s.order_filters, &packs.order_filters);
-    }
-
-    pub fn init_orders_collectors(
-        &mut self,
-        _: &[Vec<f64>],
-        s: &'a SETTINGS_PIPELINE,
-        packs: &Packs,
-    ) {
-        self.orders_collectors =
-            OrdersCollectors::new(&s.order_collectors, &packs.orders_collectors);
     }
 }
 
 impl<'a> GWValues<'a> {
     pub fn init_bf(&mut self, buffer: &[Vec<f64>], s: &SETTINGS_PIPELINE) {
-        self
-            .indicators
-            .init_bf(buffer, &s.indications);
-        self.signals_train.init_bf(
-            buffer,
-            &s.signals_train,
-            &s.indications,
-            &self.indicators,
-        );
+        self.indicators.init_bf(buffer, &s.indications);
+        self.signals_train
+            .init_bf(buffer, &s.signals_train, &s.indications, &self.indicators);
         self.signals.init_bf(
             buffer,
             &s.signals,
@@ -123,14 +119,31 @@ impl<'a> GWValues<'a> {
     }
 }
 
+impl<'a> GWValues<'a> {
+    pub fn w_all(&self, s: SETTINGS_PIPELINE) -> usize {
+        self.indicators.w_all(&s.indications)
+            + self.signals_train.w_all(&s.signals_train)
+            + self.signals.w_all(&s.signals)
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::prelude_tests::prelude::*;
+    use bc_test_kit::prelude::*;
 
-    // #[test]
-    // fn init_with_res_1() {
-    //     let mut res = GWValues::default();
-    //     assert_eq!(res.init_with(&SRC_TRANSPOSE, &S, packs, stage_end));
-    // }
+    #[test]
+    fn init_empty_with_res_1() {
+        let mut res = GWValues::default();
+        res.init_empty_with(&PIPELINE, &PACKS, "");
+        assert!(!res.signals.0.is_empty());
+    }
+
+    #[test]
+    fn init_bf_with_res_1() {
+        let mut res = GWValues::default();
+        res.init_empty_with(&PIPELINE, &PACKS, "");
+        res.init_bf_with(&SRC_TRANSPOSE, &PIPELINE, "");
+        assert!(!res.signals.0.is_empty());
+    }
 }

@@ -143,7 +143,11 @@ impl<'a, 'b> TradeRuntime<'a, 'b> {
 #[cfg(test)]
 mod test {
     use super::*;
+    use bc_indicators_gw::test_state::*;
+    use bc_packs::test_state::*;
+    use bc_signals_gw::test_state::*;
     use bc_test_kit::prelude::*;
+    use bc_utils_lg::test_state::prelude::*;
 
     #[test]
     fn init_with_res_1() {

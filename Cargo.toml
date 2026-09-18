@@ -1,10 +1,10 @@
 [package]
 name = "bc_runtime_components"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2024"
 
 [dependencies]
-bc_utils_lg = {path = "../bc_utils_lg"}
+bc_utils_lg = {path = "../bc_utils_lg", features = ["test_state"]}
 bc_utils = {path = "../bc_utils"}
 bc_exch_api_funcs = {path = "../bc_exch_api_funcs"}
 bc_indicators = {path = "../bc_indicators"}
@@ -12,18 +12,23 @@ bc_indicators_gw = {path = "../bc_indicators_gw"}
 bc_signals = {path = "../bc_signals"}
 bc_signals_gw = {path = "../bc_signals_gw"}
 bc_signals_train = {path = "../bc_signals_train"}
-bc_signals_train_gw = {path = "../bc_signals_train_gw"}
+bc_signals_train_gw = {path = "../bc_signals_train_gw", features = ["test_state"]}
 bc_order_creator_gw = {path = "../bc_order_creator_gw"}
 bc_order_filters = {path = "../bc_order_filters"}
-bc_order_filters_gw = {path = "../bc_order_filters_gw"}
+bc_order_filters_gw = {path = "../bc_order_filters_gw", features = ["test_state"]}
 bc_order_collectors = {path = "../bc_order_collectors"}
 bc_order_collectors_gw = {path = "../bc_order_collectors_gw"}
 bc_utils_state = {path = "../bc_utils_state"}
 bc_utils_state_gw = {path = "../bc_utils_state_gw"}
-bc_trade_state = {path = "../bc_trade_state"}
-bc_packs = {path = "../bc_packs"}   
+bc_trade_state = {path = "../bc_trade_state", features = ["test_state"]}
+bc_packs = {path = "../bc_packs", features = ["test_state"]}   
+
+bc_test_kit = {path = "../bc_test_kit", optional = true}
 
 [dev-dependencies]
 bc_test_kit = {path = "../bc_test_kit"}
 bc_packs = {path = "../bc_packs"}
 pretty_assertions = "1"
+
+[features]
+test_state = ["dep:bc_test_kit"]

@@ -130,7 +130,9 @@ impl<'a> GWValues<'a> {
 #[cfg(test)]
 mod test {
     use super::*;
+    use bc_packs::test_state::*;
     use bc_test_kit::prelude::*;
+    use bc_utils_lg::test_state::prelude::*;
 
     #[test]
     fn init_empty_with_res_1() {
